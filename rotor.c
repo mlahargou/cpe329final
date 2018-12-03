@@ -127,6 +127,9 @@ char getIndexByChar(char character) {
 }
 
 char getCharThroughAllRotors(Rotors allRotors, char startLetter) {
+    if (startLetter == 0xff) {
+        return 0xff
+    }
     int startIndex = getIndexByChar(startLetter);
     int endIndex = travelIndexThroughAllRotors(allRotors, startIndex);
     return getCharByIndex(endIndex);
