@@ -7,6 +7,7 @@
 
 
 #include "Keypad.h"
+#include "Display.h"
 
 void KP_init(DIO_PORT_Even_Interruptable_Type *KPBus) {
     KPBus->SEL0 = 0;
@@ -78,22 +79,15 @@ uint8_t enterKey(DIO_PORT_Even_Interruptable_Type *KPBus){
     }
 }
 
-uint8_t getNum(DIO_PORT_Even_Interruptable_Type *KPBus){
-    uint8_t i=0,num,temp;
+uint8_t getAndPrintTwoDigitNum(DIO_PORT_Even_Interruptable_Type *KPBus){
+    uint8_t firstNum, secondNum;
 
-    for(i=0;i<2;i++){
-        if((temp=enterKey(KPBus))==12 && i!=0)
-            return num;
+    firstNum = KP_getKey(KPBus);
+    sendLetterToScreen(48 + firstNum);
+    secondNum = KP_getKey(KPBus);
+    sendLetterToScreen(48 + secondNum);
 
-        if (!i && temp<10){
-            num=temp;
-        }
-
-        else if(i && temp<10){
-            num=(num*10)+temp;
-        }
-    }
-    return num;
+    return firstNum * 10 + secondNum;
 }
 
 

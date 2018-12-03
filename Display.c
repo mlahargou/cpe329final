@@ -65,33 +65,21 @@ void printTwoCharNumber(int number) {   // if number = 3456
 }
 
 void setup(DIO_PORT_Even_Interruptable_Type  *KPBus, uint8_t *pos1, uint8_t *pos2, uint8_t *pos3) {
-    uint8_t firstNum, secondNum;
     EUSCI_A0->IE |= EUSCI_A_IE_RXIE;     // Enable USCI_A0 RX interrupt
     sendWordToScreen("Setup machine", 14, 2);
+
     sendWordToScreen("Enter rotor position 1: ", 24, 0);
-    firstNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + firstNum);
-    secondNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + secondNum);
-    *pos1 = (firstNum * 10 + secondNum);
+    *pos1 = getAndPrintTwoDigitNum(KPBus);
 
     sendWordToScreen(NULL, 0, 1);  // new line
 
     sendWordToScreen("Enter rotor position 2: ", 24, 0);
-    firstNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + firstNum);
-    secondNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + secondNum);
-    *pos2 = (firstNum * 10 + secondNum);
+    *pos2 = getAndPrintTwoDigitNum(KPBus);
 
     sendWordToScreen(NULL, 0, 1);  // new line
 
     sendWordToScreen("Enter rotor position 3: ", 24, 0);
-    firstNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + firstNum);
-    secondNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + secondNum);
-    *pos3 = (firstNum * 10 + secondNum);
+    *pos3 = getAndPrintTwoDigitNum(KPBus);
 
     sendWordToScreen(NULL, 0, 1);  // new line
 

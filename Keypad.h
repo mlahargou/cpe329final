@@ -22,7 +22,7 @@
 uint8_t enterKey(DIO_PORT_Even_Interruptable_Type *KPBus);
 void KP_init(DIO_PORT_Even_Interruptable_Type *KPBus);
 uint8_t KP_getKey(DIO_PORT_Even_Interruptable_Type *KPBus);
-uint8_t getNum(DIO_PORT_Even_Interruptable_Type *KPBus);
+uint8_t getAndPrintTwoDigitNum(DIO_PORT_Even_Interruptable_Type *KPBus);
 
 
 #endif /* KEYPAD_H_ */
