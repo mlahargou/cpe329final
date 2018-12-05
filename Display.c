@@ -8,7 +8,12 @@
 
 #include "Display.h"
 #include "msp.h"
+#include "Rotor.h"
+#include "mspCommunication.h"
 
+
+char str[1024];
+uint32_t br=0,index=0;
 
 char newline[] = {13,10};
 char home[] = {0x1b, 0x5b, 0x48};
@@ -33,6 +38,8 @@ void initDisplay(DIO_PORT_Even_Interruptable_Type  *KPBus, uint8_t *pos1, uint8_
 
     EUSCI_A0->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Initialize eUSCI
     EUSCI_A0->IFG &= ~EUSCI_A_IFG_RXIFG;    // Clear eUSCI RX interrupt flag
+
+    NVIC->ISER[0] |= 1 << ((EUSCIA0_IRQn) & 31);
 
     setup(KPBus, pos1,pos2,pos3);
 }
@@ -116,3 +123,103 @@ void printFourCharNumber(int number) {   // if number = 3456
     sendLetterToScreen(48 + (number % 10));
 }
 
+void inputWord(uint32_t *size){
+    EUSCI_A0->IE |= EUSCI_A_IE_RXIE;     // Enable USCI_A0 RX interrupt
+
+    while(1){
+        if(br || index==1023){
+            str[index]=(char)255;
+            index++;
+            break;
+        }
+    }
+    *size=index;
+    index=0;
+    br=0;
+    EUSCI_A0->IE &= ~EUSCI_A_IE_RXIE;     // Enable USCI_A0 RX interrupt
+}
+
+
+void message(Rotors allRotors){
+    uint32_t size=0;
+    sendWordToScreen("Enter message: ", 15, 0);
+    inputWord(&size);
+
+    /*Send word here
+     *
+    for(i=0;i<1024;i++)
+        str[i]=0;
+     */
+
+    sendWordToScreen(NULL, 0, 2);
+    encryptAndSend(allRotors,size,str);
+
+
+
+    /*
+     *
+     * Left off here, remove function calls below and replace with working algorithm
+     *
+     *
+     * */
+
+    //wait until we have a message to receive
+
+    sendWordToScreen("Waiting for message...", 22, 1);
+    while(!messageComplete);
+    //reset our received messageComplete
+    messageComplete = 0;
+    delay_ms(1);
+
+    sendWordToScreen("Message from user: MSG should appear after: ", 44, 2);
+    decryptMessageAndPrint(allRotors, receivedMessage);
+
+}
+
+
+void decryptMessageAndPrint(Rotors allRotors, char * encryptedMessage) {
+    char letter = encryptedMessage[0];
+
+    while (letter != 0xff) {
+        sendLetterToScreen(getCharThroughAllRotors(allRotors, letter));
+        index++;
+        letter = encryptedMessage[index];
+    }
+}
+
+void encryptAndSend(Rotors allRotors, int size, char * decryptedMessage) {
+    char * encryptedMessage;
+    char letter = decryptedMessage[0];
+    int index = 0;
+
+    while(index < size) {
+        encryptedMessage[index] = getCharThroughAllRotors(allRotors, letter);
+        index++;
+        letter = decryptedMessage[index];
+    }
+
+    encryptedMessage[size] = 0xff;
+
+    sendMessege(decryptedMessage);
+}
+
+void EUSCIA0_IRQHandler(void)
+{
+    uint8_t input;
+    if (EUSCI_A0->IFG & EUSCI_A_IFG_RXIFG)
+    {
+        // Check if the TX buffer is empty first
+        while(!(EUSCI_A0->IFG & EUSCI_A_IFG_TXIFG));
+
+        input = EUSCI_A0->RXBUF;
+
+        if(input==13)
+            br=1;
+
+        else{
+            str[index]=input;
+            index++;
+            sendLetterToScreen(input);
+        }
+    }
+}

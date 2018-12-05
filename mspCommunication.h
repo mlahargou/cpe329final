@@ -8,8 +8,12 @@
 #ifndef MSPCOMMUNICATION_H_
 #define MSPCOMMUNICATION_H_
 
+int messageComplete;
+static char receivedMessage[1024];
+
 void mspCommunicationInit();
 void recievedChar (char letter);
 void sendMessege(char * message);
+
 
 #endif /* MSPCOMMUNICATION_H_ */

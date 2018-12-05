@@ -1,4 +1,4 @@
-#include "rotor.h"
+#include <Rotor.h>
 
 Rotors initRotors(int rotorAPos, int rotorBPos, int rotorCPos) {
     Rotors allRotors = {
@@ -128,7 +128,7 @@ char getIndexByChar(char character) {
 
 char getCharThroughAllRotors(Rotors allRotors, char startLetter) {
     if (startLetter == 0xff) {
-        return 0xff
+        return 0xff;
     }
     int startIndex = getIndexByChar(startLetter);
     int endIndex = travelIndexThroughAllRotors(allRotors, startIndex);

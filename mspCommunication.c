@@ -6,6 +6,7 @@
  */
 
 #include "mspCommunication.h"
+#include "msp.h"
 
 
 //run this at 12MHz
@@ -31,6 +32,12 @@ void mspCommunicationInit() {
     EUSCI_A2->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Initialize eUSCI
 
     EUSCI_A2->IFG &= ~EUSCI_A_IFG_RXIFG;    // Clear eUSCI RX interrupt flag
+
+    // Enable eUSCIA0 interrupt in NVIC module
+    NVIC->ISER[0] = 1 << ((EUSCIA2_IRQn) & 31);
+
+    //initially set the message to incomplete
+    messageComplete = 0;
 }
 
 // UART interrupt service routine
@@ -38,21 +45,17 @@ void EUSCIA2_IRQHandler(void)
 {
     if (EUSCI_A2->IFG & EUSCI_A_IFG_RXIFG)
     {
-        // Check if the TX buffer is empty first
-        //while(!(EUSCI_A0->IFG & EUSCI_A_IFG_TXIFG));
-
         recievedChar(EUSCI_A2->RXBUF);
     }
 }
 
 void recievedChar (char letter) {
     static int index = 0;
-    static char message[1024];
 
-    message[index] = letter;
+    receivedMessage[index] = letter;
 
     if (letter == 0xff) {
-        decryptAndPrint(message);
+        messageComplete = 1;
         index = 0;
     }
 
@@ -65,7 +68,7 @@ void sendMessege(char * message) {
 
     while (letter != 0xff) {
         // Check if the TX buffer is empty first
-        while(!(EUSCI_A0->IFG & EUSCI_A_IFG_TXIFG));
+        while(!(EUSCI_A2->IFG & EUSCI_A_IFG_TXIFG));
 
         EUSCI_A2->TXBUF = letter;
         i++;
