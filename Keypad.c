@@ -5,7 +5,6 @@
  *      Author: dillon
  */
 
-
 #include "Keypad.h"
 #include "Display.h"
 
@@ -28,7 +27,7 @@ uint8_t KP_getKey(DIO_PORT_Even_Interruptable_Type *KPBus) {
     while(1) {
         row = KPBus->IN & (ROW1 | ROW2 | ROW3 | ROW4);
         if (row != 0) {
-            break;  //add a define
+            break;
         }
     }
 
@@ -48,6 +47,7 @@ uint8_t KP_getKey(DIO_PORT_Even_Interruptable_Type *KPBus) {
     if (col == 3) {
         return 0xFF;
     }
+    //Algorithm to get all the right return values.
     if (row == 4) {
         row = 3;
     }
@@ -82,12 +82,12 @@ uint8_t enterKey(DIO_PORT_Even_Interruptable_Type *KPBus){
 uint8_t getAndPrintTwoDigitNum(DIO_PORT_Even_Interruptable_Type *KPBus){
     uint8_t firstNum, secondNum;
 
-    firstNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + firstNum);
-    secondNum = KP_getKey(KPBus);
-    sendLetterToScreen(48 + secondNum);
+    firstNum = KP_getKey(KPBus);                //requests a number from keypad
+    sendLetterToScreen(48 + firstNum);          //sends number to screen with ascii offset
+    secondNum = KP_getKey(KPBus);               //requests a number from keypad
+    sendLetterToScreen(48 + secondNum);         //sends number to screen with ascii offset
 
-    return firstNum * 10 + secondNum;
+    return (firstNum * 10 + secondNum);         //turns two one digit ints into a single two digit value
 }
 
 

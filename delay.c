@@ -4,7 +4,6 @@
 
 
 void optimize48Mhz(){
-
     /*Wait until not busy*/
     while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
 
@@ -21,7 +20,6 @@ void optimize48Mhz(){
     FLCTL->BANK1_RDCTL = (FLCTL->BANK0_RDCTL &
             ~(FLCTL_BANK1_RDCTL_WAIT_MASK)) | FLCTL_BANK1_RDCTL_WAIT_1;
 }
-
 
 void setDCO(uint32_t frequency){
     CS->KEY = CS_KEY_VAL;         /*UNLOCK REGISTERS*/
@@ -92,7 +90,6 @@ void delay_us(uint64_t microSeconds){
     }
 
    for (i = 0; i < end;i++);
-
 }
 
 void delay_ms(uint64_t milliseconds){

@@ -9,7 +9,7 @@
 #define MSPCOMMUNICATION_H_
 
 int messageComplete;
-static char receivedMessage[1024];
+char receivedMessage[1024];
 
 void mspCommunicationInit();
 void recievedChar (char letter);

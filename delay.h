@@ -12,5 +12,4 @@
     void delay_us(uint64_t microSeconds);
     void setDCO(uint32_t frequency);
 
-
 #endif

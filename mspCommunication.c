@@ -7,7 +7,7 @@
 
 #include "mspCommunication.h"
 #include "msp.h"
-
+#include "delay.h"
 
 //run this at 12MHz
 
@@ -32,9 +32,10 @@ void mspCommunicationInit() {
     EUSCI_A2->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Initialize eUSCI
 
     EUSCI_A2->IFG &= ~EUSCI_A_IFG_RXIFG;    // Clear eUSCI RX interrupt flag
+    EUSCI_A2->IE |= EUSCI_A_IE_RXIE;     // Enable USCI_A0 RX interrupt
 
     // Enable eUSCIA0 interrupt in NVIC module
-    NVIC->ISER[0] = 1 << ((EUSCIA2_IRQn) & 31);
+    NVIC->ISER[0] |= 1 << ((EUSCIA2_IRQn) & 31);       //was [0], we are trying [1]?
 
     //initially set the message to incomplete
     messageComplete = 0;
@@ -45,21 +46,25 @@ void EUSCIA2_IRQHandler(void)
 {
     if (EUSCI_A2->IFG & EUSCI_A_IFG_RXIFG)
     {
+        EUSCI_A2->IFG &=~ EUSCI_A_IFG_RXIFG; //clear interupts
         recievedChar(EUSCI_A2->RXBUF);
+
     }
 }
 
 void recievedChar (char letter) {
-    static int index = 0;
+    static int i = 0;
 
-    receivedMessage[index] = letter;
+    receivedMessage[i] = letter;
+    i++;
 
     if (letter == 0xff) {
         messageComplete = 1;
-        index = 0;
+        i = 0;
+
     }
 
-    index++;
+
 }
 
 void sendMessege(char * message) {
@@ -69,9 +74,11 @@ void sendMessege(char * message) {
     while (letter != 0xff) {
         // Check if the TX buffer is empty first
         while(!(EUSCI_A2->IFG & EUSCI_A_IFG_TXIFG));
-
+        delay_us(200);
         EUSCI_A2->TXBUF = letter;
         i++;
         letter = message[i];
     }
+   // delay_us(200);
+    EUSCI_A2->TXBUF = 0xFF;
 }
