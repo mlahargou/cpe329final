@@ -89,25 +89,3 @@ uint8_t getAndPrintTwoDigitNum(DIO_PORT_Even_Interruptable_Type *KPBus){
 
     return (firstNum * 10 + secondNum);         //turns two one digit ints into a single two digit value
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

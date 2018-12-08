@@ -97,7 +97,6 @@ void setup(DIO_PORT_Even_Interruptable_Type  *KPBus, uint8_t *pos1, uint8_t *pos
 
     sendWordToScreen(NULL, 0, 2);  // new line
 
-
     sendWordToScreen("Enter 01 to send first, Enter 00 to receive first: ", 51, 0);
 
     *user = getAndPrintTwoDigitNum(KPBus);      // determines message order
@@ -181,7 +180,7 @@ void encryptAndSend(Rotors *allRotors, int size, char * decryptedMessage) {
     char val;
 
     /*
-     * Because we know the size of the word, encrypt the mesage and send each
+     * Because we know the size of the word, encrypt the message and send each
      * char one at a time.  Once we get to the end of size, add a 0xff so
      * the receiving enigma machine knows when the message is complete.
      */
@@ -219,9 +218,3 @@ void EUSCIA0_IRQHandler(void)
         }
     }
 }
-
-
-
-
-
-

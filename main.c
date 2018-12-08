@@ -8,25 +8,22 @@
  * main.c
  */
 
-
 void main(void)
 {
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
-
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;         // stop watchdog timer
+    uint8_t user;                                       // determines send or receive first message
     DIO_PORT_Even_Interruptable_Type *KPBus=P4;
-    uint8_t *pos1=NULL, *pos2=NULL, *pos3=NULL;
 
-    Rotors allRotors = initRotors(0,0,0);
+    setDCO(FREQ_48_MHZ);                                // MCLK fed from 48 MHZ DCO
 
-    setDCO(FREQ_48_MHZ);
-
-    KP_init(KPBus);
+    KP_init(KPBus);                                     // Initiates Keypad with Pin 4 connections
     mspCommunicationInit();
-    initDisplay(KPBus,pos1,pos2,pos3);
+
+    Rotors allRotors = initDisplay(KPBus,&user);
 
     __enable_irq();
 
     while(1){
-        message(allRotors);
+        message(&allRotors,&user);                      // send and recieve message loop
     }
 }

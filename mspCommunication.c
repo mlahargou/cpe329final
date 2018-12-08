@@ -55,26 +55,25 @@ void EUSCIA2_IRQHandler(void)
 void recievedChar (char letter) {
     static int i = 0;
 
+    //Add our letter to the message
     receivedMessage[i] = letter;
     i++;
 
+    //If the letter is our stopping byte, we have completed the message
     if (letter == 0xff) {
         messageComplete = 1;
         i = 0;
-
     }
-
-
 }
 
 void sendMessege(char * message) {
     int i = 0;
     char letter = message[0];
 
+    //Keep sending until our stop byte
     while (letter != 0xff) {
         // Check if the TX buffer is empty first
         while(!(EUSCI_A2->IFG & EUSCI_A_IFG_TXIFG));
-        delay_us(200);
         EUSCI_A2->TXBUF = letter;
         i++;
         letter = message[i];
